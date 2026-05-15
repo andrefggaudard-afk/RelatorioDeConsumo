@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Relatório de Consumo</title>
+<title>Painel de Controle de Lotes</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
- 
+
 :root{
   --ink:     #01223E;
   --blue:    #113D63;
@@ -31,10 +31,10 @@
   --sh:      0 1px 3px rgba(1,34,62,.07), 0 6px 18px rgba(1,34,62,.08);
   --shd:     0 2px 8px rgba(1,34,62,.10), 0 16px 40px rgba(1,34,62,.12);
 }
- 
+
 html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px;line-height:1.55}
- 
+
 /* ══ HEADER ═══════════════════════════════════════════════════════ */
 .app-hdr{
   background:linear-gradient(135deg,var(--ink) 0%,var(--blue) 55%,var(--mid) 100%);
@@ -72,7 +72,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 .ntab.on{color:#fff;border-bottom-color:var(--sky)}
 .ntab svg{opacity:.7}
 .ntab.on svg{opacity:1}
- 
+
 /* ══ TOOLBAR ═══════════════════════════════════════════════════════ */
 .toolbar{
   background:var(--surface);border-bottom:1px solid var(--s200);
@@ -91,13 +91,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 .btn-green{background:var(--green);color:#fff}
 .btn-green:hover{background:#046242;transform:translateY(-1px)}
 .btn-red{background:var(--red);color:#fff}
-.btn-red:hover{background:#a30015;transform:translateY(-1px)}
+.btn-red:hover{background:#a3001500;transform:translateY(-1px);background:#a30015}
 .btn-ghost{background:transparent;color:var(--s500);border:1.5px solid var(--s200)}
 .btn-ghost:hover{background:var(--s100)}
+.btn-share{background:linear-gradient(135deg,#7BB6E0,#113D63);color:#fff}
+.btn-share:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 4px 14px rgba(17,61,99,.3)}
 #file-input{display:none}
 .upload-lbl{cursor:pointer}
 .ml-auto{margin-left:auto}
- 
+
 /* ══ FILTERS ════════════════════════════════════════════════════════ */
 .fbar{background:var(--surface);border-bottom:1px solid var(--s200)}
 .finner{max-width:1360px;margin:0 auto;padding:14px 28px}
@@ -114,10 +116,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 }
 .ff input:focus,.ff select:focus{border-color:var(--sky);background:#fff}
 .faction{display:flex;gap:8px;margin-top:10px}
- 
+
 /* ══ MAIN ══════════════════════════════════════════════════════════ */
 .main{max-width:1360px;margin:0 auto;padding:24px 28px 56px}
- 
+
 /* ── STRIP ── */
 .strip{
   background:linear-gradient(135deg,var(--ink),var(--blue));
@@ -130,7 +132,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 .si-lbl{font-size:.65rem;color:var(--ice);text-transform:uppercase;letter-spacing:.07em;font-weight:600;opacity:.75}
 .si-val{font-size:1.6rem;font-weight:700;color:#fff;font-family:'DM Mono',monospace;line-height:1.1;margin-top:2px}
 .si-val.sm{font-size:1rem;margin-top:4px}
- 
+
 /* ── SECTION ── */
 .sec{margin-bottom:44px}
 .sec-hd{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--s200)}
@@ -140,14 +142,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 .ico-t{background:var(--s100)}
 .sec-hd h2{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--ink)}
 .sec-badge{margin-left:auto;background:var(--s100);border-radius:20px;padding:3px 11px;font-size:.7rem;font-family:'DM Mono',monospace;color:var(--s500)}
- 
+
 /* ── GRID ── */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 @media(max-width:1100px){.g4{grid-template-columns:1fr 1fr}}
 @media(max-width:780px){.g2,.g3,.g4{grid-template-columns:1fr}}
- 
+
 /* ── CARD ── */
 .card{
   background:var(--surface);border-radius:12px;box-shadow:var(--sh);
@@ -155,7 +157,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 }
 .card:hover{box-shadow:var(--shd)}
 .ctitle{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;color:var(--blue);margin-bottom:14px;display:flex;align-items:center;gap:7px}
- 
+
 /* ── KPI ── */
 .kpi{
   background:var(--surface);border-radius:12px;border:1px solid var(--s100);
@@ -175,7 +177,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 .kpi.dark .klbl{color:var(--ice);opacity:.7}
 .kpi.dark .kval{color:#fff}
 .kpi.dark .ksub{color:rgba(255,255,255,.4)}
- 
+
 /* ── RANK ── */
 .rl{display:flex;flex-direction:column;gap:8px}
 .ri{
@@ -199,7 +201,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
   font-family:'DM Mono',monospace;
 }
 .rbadge.am{background:var(--amber)}.rbadge.gr{background:var(--green)}.rbadge.pu{background:var(--purple)}
- 
+
 /* ── PROGRESS ── */
 .pl{display:flex;flex-direction:column;gap:10px}
 .pi-hd{display:flex;justify-content:space-between;margin-bottom:4px}
@@ -207,7 +209,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 .pi-vl{font-size:.7rem;color:var(--s300);font-family:'DM Mono',monospace}
 .pi-track{height:8px;background:var(--s200);border-radius:4px;overflow:hidden}
 .pi-fill{height:100%;border-radius:4px;transition:width .5s}
- 
+
 /* ── CHART ── */
 .cw{position:relative}
 .cw canvas{display:block}
@@ -215,7 +217,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   height:100%;gap:8px;color:var(--s300);font-size:.78rem;
 }
- 
+
 /* ── TABLE ── */
 .twrap{overflow-x:auto;border-radius:8px;border:1px solid var(--s200)}
 table{width:100%;border-collapse:collapse;font-size:.77rem}
@@ -229,19 +231,19 @@ tbody tr:nth-child(even){background:var(--bg)}
 tbody tr:hover{background:var(--ice)}
 tbody td{padding:8px 14px;color:var(--s700);border-bottom:1px solid var(--s100);white-space:nowrap}
 .te{text-align:center;padding:40px;color:var(--s300);font-size:.82rem}
- 
+
 /* ── BADGE ── */
 .badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:12px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .bm{background:#DBEAFE;color:#1E40AF}
 .bf{background:#FEF3C7;color:#92400E}
 .be{background:#D1FAE5;color:#065F46}
 .bl{background:#EDE9FE;color:#5B21B6}
- 
+
 /* ── EMPTY ── */
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:10px;color:var(--s300)}
 .empty svg{opacity:.3}
 .empty p{font-size:.8rem}
- 
+
 /* ── TOAST ── */
 #toast{
   position:fixed;bottom:24px;right:24px;z-index:9999;
@@ -252,10 +254,10 @@ tbody td{padding:8px 14px;color:var(--s700);border-bottom:1px solid var(--s100);
 }
 #toast.show{opacity:1;transform:translateY(0)}
 #toast.err{background:var(--red)}
- 
+
 /* ── MT ── */
 .mt{margin-top:16px}
- 
+
 /* ── PRINT ── */
 @media print{
   .toolbar,.fbar,.hdr-nav,.noprint{display:none!important}
@@ -264,7 +266,7 @@ tbody td{padding:8px 14px;color:var(--s700);border-bottom:1px solid var(--s100);
   .card,.kpi{box-shadow:none;border:1px solid #ccc}
   .app-hdr{position:static}
 }
- 
+
 /* ── ANIM ── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .anim{animation:fadeUp .35s ease both}
@@ -272,7 +274,7 @@ tbody td{padding:8px 14px;color:var(--s700);border-bottom:1px solid var(--s100);
 </style>
 </head>
 <body>
- 
+
 <!-- HEADER -->
 <header class="app-hdr">
   <div class="hdr-top">
@@ -285,7 +287,7 @@ tbody td{padding:8px 14px;color:var(--s700);border-bottom:1px solid var(--s100);
       </svg>
     </div>
     <div class="hdr-brand">
-      <h1>Relatório de consumo</h1>
+      <h1>Painel de Controle de Lotes</h1>
       <p>Controle de Saídas de Materiais, Ferramentas, EPIs e Logística</p>
     </div>
     <div class="hdr-meta">
@@ -312,190 +314,234 @@ tbody td{padding:8px 14px;color:var(--s700);border-bottom:1px solid var(--s100);
     </button>
     <button class="ntab" onclick="goTo('st')">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
-      Tabela
+      Registros
     </button>
   </nav>
 </header>
- 
+
 <!-- TOOLBAR -->
 <div class="toolbar noprint">
-  <label for="file-input" class="btn btn-ink upload-lbl">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-    Importar XLSX
+  <input type="file" id="file-input" accept=".xlsx,.xls">
+  <label for="file-input" class="upload-lbl">
+    <span class="btn btn-ink">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+      Importar XLSX
+    </span>
   </label>
-  <input type="file" id="file-input" accept=".xlsx, .xls">
-  
   <button class="btn btn-sky" onclick="dlTemplate()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
     Baixar Template
   </button>
- 
-  <button class="btn btn-ghost" onclick="loadDemo()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-    Carregar Demo
+  <button class="btn btn-green" onclick="loadDemo()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    Demo
   </button>
- 
-  <button class="btn btn-red ml-auto" onclick="clearAll()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
-    Limpar Dados
+  <button class="btn btn-ghost" onclick="clearAll()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+    Limpar
+  </button>
+  <button class="btn btn-share noprint" onclick="openShare()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    Compartilhar
+  </button>
+  <button class="btn btn-red ml-auto noprint" onclick="window.print()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>
+    Imprimir
   </button>
 </div>
- 
+
+<!-- MODAL COMPARTILHAR -->
+<div id="share-overlay" onclick="closeShare()" style="display:none;position:fixed;inset:0;background:rgba(1,34,62,.55);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
+  <div onclick="event.stopPropagation()" style="background:#fff;border-radius:16px;padding:28px 28px 24px;max-width:520px;width:calc(100% - 32px);box-shadow:0 24px 64px rgba(1,34,62,.25);position:relative">
+    <button onclick="closeShare()" style="position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;font-size:1.2rem;color:#A0B4C8;line-height:1">✕</button>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+      <div style="width:40px;height:40px;border-radius:10px;background:#EDF2F7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#113D63" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      </div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:#01223E">Compartilhar Painel</div>
+        <div style="font-size:.75rem;color:#A0B4C8;margin-top:2px">Os dados ficam embutidos no link — sem servidor necessário</div>
+      </div>
+    </div>
+
+    <div id="share-status" style="font-size:.78rem;color:#5A7A96;margin-bottom:12px;min-height:20px"></div>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <input id="share-url" readonly style="flex:1;border:1.5px solid #CFD9E6;border-radius:7px;padding:9px 12px;font-size:.75rem;font-family:'DM Mono',monospace;color:#01223E;background:#EDF2F7;outline:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" placeholder="Gerando link...">
+      <button class="btn btn-ink" id="copy-btn" onclick="copyLink()" style="flex-shrink:0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copiar
+      </button>
+    </div>
+
+    <div id="share-warn" style="display:none;background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;font-size:.75rem;color:#92400E;line-height:1.5;margin-bottom:14px">
+      ⚠️ <strong>Link muito grande.</strong> Alguns navegadores ou apps de mensagem podem truncar URLs longas.<br>
+      Nesse caso, use <strong>Exportar CSV</strong> e envie o arquivo junto com o link do painel.
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" style="background:#25D366;color:#fff;font-size:.75rem" onclick="shareWA()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+        WhatsApp
+      </button>
+      <button class="btn btn-ghost" style="font-size:.75rem" onclick="closeShare()">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <!-- FILTERS -->
 <div class="fbar noprint">
   <div class="finner">
     <div class="fhead">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-      <h3>Filtros Globais</h3>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#113D63" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      <h3>Filtros</h3>
       <button class="ftoggle" id="ftbtn" onclick="toggleF()">▲ Ocultar</button>
     </div>
     <div id="fbody">
       <div class="fgrid">
-        <div class="ff"><label>Data Início</label><input type="date" id="fds" onchange="applyF()"></div>
-        <div class="ff"><label>Data Fim</label><input type="date" id="fde" onchange="applyF()"></div>
-        <div class="ff"><label>Setor</label><select id="fset" onchange="applyF()"><option value="">Todos</option></select></div>
-        <div class="ff"><label>Colab. (Mat)</label><select id="fcm" onchange="applyF()"><option value="">Todos</option></select></div>
-        <div class="ff"><label>Colab. (EPI)</label><select id="fce" onchange="applyF()"><option value="">Todos</option></select></div>
-        <div class="ff"><label>Unidade (EPI)</label><select id="fun" onchange="applyF()"><option value="">Todos</option></select></div>
-        <div class="ff"><label>Unidade (Log)</label><select id="flu" onchange="applyF()"><option value="">Todos</option></select></div>
-        <div class="ff"><label>Tipo Envio</label><select id="fte" onchange="applyF()"><option value="">Todos</option></select></div>
+        <div class="ff"><label>Data início</label><input type="date" id="fds" onchange="applyF()"></div>
+        <div class="ff"><label>Data fim</label><input type="date" id="fde" onchange="applyF()"></div>
+        <div class="ff"><label>Setor (Mat./Fer.)</label>
+          <select id="fset" onchange="applyF()"><option value="">Todos</option></select></div>
+        <div class="ff"><label>Colaborador (Mat.)</label>
+          <select id="fcm" onchange="applyF()"><option value="">Todos</option></select></div>
+        <div class="ff"><label>Colaborador (EPI)</label>
+          <select id="fce" onchange="applyF()"><option value="">Todos</option></select></div>
+        <div class="ff"><label>Unidade (EPI)</label>
+          <select id="fun" onchange="applyF()"><option value="">Todas</option></select></div>
+        <div class="ff"><label>Unidade (Logística)</label>
+          <select id="flu" onchange="applyF()"><option value="">Todas</option></select></div>
+        <div class="ff"><label>Tipo de Envio</label>
+          <select id="fte" onchange="applyF()"><option value="">Todos</option></select></div>
       </div>
       <div class="faction">
-        <button class="btn btn-ghost" style="padding:5px 12px;font-size:.7rem" onclick="resetF()">Resetar Filtros</button>
+        <button class="btn btn-ghost" onclick="resetF()" style="padding:5px 12px;font-size:.72rem">✕ Limpar filtros</button>
       </div>
     </div>
   </div>
 </div>
- 
+
+<!-- MAIN -->
 <main class="main">
- 
-  <!-- RESUMO RÁPIDO -->
+
+  <!-- STRIP -->
   <div class="strip anim">
-    <div class="si">
-      <div class="si-lbl">Total Geral</div>
-      <div class="si-val" id="ss0">0</div>
-    </div>
-    <div class="si">
-      <div class="si-lbl">Materiais</div>
-      <div class="si-val" id="ss1">0</div>
-      <div class="si-lbl" id="ss2">0 unid.</div>
-    </div>
-    <div class="si">
-      <div class="si-lbl">Ferramentas</div>
-      <div class="si-val" id="ss3">0</div>
-    </div>
-    <div class="si">
-      <div class="si-lbl">EPIs</div>
-      <div class="si-val" id="ss4">0</div>
-      <div class="si-val sm" id="ss5">R$ 0,00</div>
-    </div>
-    <div class="si">
-      <div class="si-lbl">Logística</div>
-      <div class="si-val" id="ss6">0</div>
-    </div>
+    <div class="si"><div class="si-lbl">Total Registros</div><div class="si-val" id="ss0">0</div></div>
+    <div class="si"><div class="si-lbl">Saídas Materiais</div><div class="si-val" id="ss1">0</div></div>
+    <div class="si"><div class="si-lbl">Qtd. Materiais</div><div class="si-val" id="ss2">0</div></div>
+    <div class="si"><div class="si-lbl">Saídas Ferramentas</div><div class="si-val" id="ss3">0</div></div>
+    <div class="si"><div class="si-lbl">Saídas EPIs</div><div class="si-val" id="ss4">0</div></div>
+    <div class="si"><div class="si-lbl">Gasto EPI</div><div class="si-val sm" id="ss5">R$ 0,00</div></div>
+    <div class="si"><div class="si-lbl">Envios Logística</div><div class="si-val" id="ss6">0</div></div>
   </div>
- 
-  <!-- ██ MATERIAIS ████████████████████████████████████████████████ -->
+
+  <!-- ██ MATERIAIS █████████████████████████████████████████████████ -->
   <div class="sec anim d1" id="sm">
     <div class="sec-hd">
       <div class="sec-ico ico-m">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2.2"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
       </div>
-      <h2>Materiais</h2>
+      <h2>Controle de Saídas de Materiais</h2>
       <span class="sec-badge" id="cm-cnt">0 registros</span>
     </div>
     <div class="g4" style="margin-bottom:16px">
-      <div class="kpi dark" style="--kc:var(--sky)">
-        <div class="klbl">Saídas Totais</div>
-        <div class="kval" id="mk1">0</div><div class="ksub">Linhas na aba Dados</div>
+      <div class="kpi" style="--kc:#1E40AF">
+        <div class="klbl">Saídas (registros)</div>
+        <div class="kval" id="mk1">0</div><div class="ksub">Linhas da aba Dados</div>
       </div>
-      <div class="kpi" style="--kc:var(--blue)">
-        <div class="klbl">Qtd Total Unid.</div>
-        <div class="kval" id="mk2">0</div><div class="ksub">Soma da coluna Qtd</div>
+      <div class="kpi" style="--kc:#7BB6E0">
+        <div class="klbl">Quantidade total</div>
+        <div class="kval" id="mk2">0</div><div class="ksub">Unidades retiradas</div>
       </div>
-      <div class="kpi" style="--kc:var(--mid)">
-        <div class="klbl">Material + Retirado</div>
+      <div class="kpi" style="--kc:#059669">
+        <div class="klbl">Item mais retirado</div>
         <div class="kval sm" id="mk3">—</div><div class="ksub" id="mk3s"></div>
       </div>
-      <div class="kpi" style="--kc:var(--sky)">
-        <div class="klbl">Colaborador Top</div>
+      <div class="kpi" style="--kc:#D97706">
+        <div class="klbl">Colaborador top</div>
         <div class="kval sm" id="mk4">—</div><div class="ksub" id="mk4s"></div>
       </div>
     </div>
-    <div class="g3">
+    <div class="g2">
       <div class="card">
-        <div class="ctitle">Materiais com mais saídas (unid.)</div>
+        <div class="ctitle">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#113D63" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+          Top 7 — Itens mais retirados
+        </div>
         <div class="rl" id="m-items"><div class="empty"><p>Sem dados</p></div></div>
       </div>
       <div class="card">
-        <div class="ctitle">Top Colaboradores (Materiais)</div>
+        <div class="ctitle">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#113D63" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Top 7 — Colaboradores com mais retiradas
+        </div>
         <div class="rl" id="m-colab"><div class="empty"><p>Sem dados</p></div></div>
       </div>
-      <div class="card">
-        <div class="ctitle">Saídas por Setor</div>
-        <div class="cw" style="height:220px"><canvas id="ch-m-set"></canvas><div class="cempty" id="ce-m-set">Sem dados</div></div>
-      </div>
+    </div>
+    <div class="card mt">
+      <div class="ctitle">Saídas por Setor (Materiais)</div>
+      <div class="cw" style="height:200px"><canvas id="ch-m-set"></canvas><div class="cempty" id="ce-m-set"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M18 9l-5 5-2-2-5 5"/></svg>Sem dados</div></div>
     </div>
   </div>
- 
-  <!-- ██ FERRAMENTAS ██████████████████████████████████████████████ -->
+
+  <!-- ██ FERRAMENTAS ███████████████████████████████████████████████ -->
   <div class="sec anim d2" id="sf">
     <div class="sec-hd">
       <div class="sec-ico ico-f">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2.2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
       </div>
-      <h2>Ferramentas</h2>
+      <h2>Controle de Saídas de Ferramentas</h2>
       <span class="sec-badge" id="cf-cnt">0 registros</span>
     </div>
     <div class="g4" style="margin-bottom:16px">
-      <div class="kpi dark" style="--kc:var(--amber)">
-        <div class="klbl">Saídas Totais</div>
-        <div class="kval" id="fk1">0</div><div class="ksub">Linhas na aba Dados</div>
+      <div class="kpi" style="--kc:#92400E">
+        <div class="klbl">Saídas (registros)</div>
+        <div class="kval" id="fk1">0</div><div class="ksub">Linhas da aba Dados</div>
       </div>
-      <div class="kpi" style="--kc:var(--amber)">
-        <div class="klbl">Qtd Total Unid.</div>
-        <div class="kval" id="fk2">0</div><div class="ksub">Soma da coluna Qtd</div>
+      <div class="kpi" style="--kc:#FDE68A">
+        <div class="klbl">Quantidade total</div>
+        <div class="kval" id="fk2">0</div><div class="ksub">Ferramentas retiradas</div>
       </div>
-      <div class="kpi" style="--kc:#FEF3C7">
-        <div class="klbl">Ferramenta + Retirada</div>
+      <div class="kpi" style="--kc:#D97706">
+        <div class="klbl">Ferramenta top</div>
         <div class="kval sm" id="fk3">—</div><div class="ksub" id="fk3s"></div>
       </div>
-      <div class="kpi" style="--kc:var(--amber)">
-        <div class="klbl">Colaborador Top</div>
+      <div class="kpi" style="--kc:#B45309">
+        <div class="klbl">Colaborador top</div>
         <div class="kval sm" id="fk4">—</div><div class="ksub" id="fk4s"></div>
       </div>
     </div>
     <div class="g2">
       <div class="card">
-        <div class="ctitle">Ferramentas mais retiradas</div>
+        <div class="ctitle">Top 7 — Ferramentas com mais saídas</div>
         <div class="rl" id="f-items"><div class="empty"><p>Sem dados</p></div></div>
       </div>
       <div class="card">
-        <div class="ctitle">Top Colaboradores (Ferramentas)</div>
+        <div class="ctitle">Top 7 — Colaboradores que mais retiraram ferramentas</div>
         <div class="rl" id="f-colab"><div class="empty"><p>Sem dados</p></div></div>
       </div>
     </div>
   </div>
- 
-  <!-- ██ EPIs ████████████████████████████████████████████████████ -->
+
+  <!-- ██ EPI ███████████████████████████████████████████████████████ -->
   <div class="sec anim d3" id="se">
     <div class="sec-hd">
       <div class="sec-ico ico-e">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#065F46" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       </div>
-      <h2>EPIs</h2>
+      <h2>Controle de Carregamentos de EPI</h2>
       <span class="sec-badge" id="ce-cnt">0 registros</span>
     </div>
     <div class="g4" style="margin-bottom:16px">
-      <div class="kpi dark" style="--kc:var(--green)">
+      <div class="kpi dark" style="--kc:var(--sky)">
         <div class="klbl">Gasto Total EPI</div>
-        <div class="kval sm" id="ek1">R$ 0,00</div><div class="ksub">Soma de Preço * Qtd</div>
+        <div class="kval" style="font-size:1.2rem" id="ek1">R$ 0,00</div><div class="ksub">Preço × Saídas</div>
       </div>
-      <div class="kpi" style="--kc:var(--green)">
-        <div class="klbl">Total de Saídas</div>
+      <div class="kpi" style="--kc:#057A55">
+        <div class="klbl">Saídas registradas</div>
         <div class="kval" id="ek2">0</div><div class="ksub">Linhas da aba EPIs</div>
       </div>
-      <div class="kpi" style="--kc:#D1FAE5">
+      <div class="kpi" style="--kc:#BBF7D0">
         <div class="klbl">EPI mais retirado</div>
         <div class="kval sm" id="ek3">—</div><div class="ksub" id="ek3s"></div>
       </div>
@@ -529,7 +575,7 @@ tbody td{padding:8px 14px;color:var(--s700);border-bottom:1px solid var(--s100);
       <div class="rl" id="e-colab"><div class="empty"><p>Sem dados</p></div></div>
     </div>
   </div>
- 
+
   <!-- ██ LOGÍSTICA ████████████████████████████████████████████████ -->
   <div class="sec anim d4" id="sl">
     <div class="sec-hd">
@@ -572,7 +618,7 @@ tbody td{padding:8px 14px;color:var(--s700);border-bottom:1px solid var(--s100);
       <div class="cw" style="height:180px"><canvas id="ch-l-tipo"></canvas><div class="cempty" id="ce-l-tipo">Sem dados</div></div>
     </div>
   </div>
- 
+
   <!-- ██ TABELA ████████████████████████████████████████████████████ -->
   <div class="sec" id="st">
     <div class="sec-hd">
@@ -606,63 +652,34 @@ tbody td{padding:8px 14px;color:var(--s700);border-bottom:1px solid var(--s100);
       </div>
     </div>
   </div>
- 
+
 </main>
- 
+
 <div id="toast"><span id="tmsg"></span></div>
- 
+
 <script>
 /* ══ STATE ══════════════════════════════════════════════════════════ */
 const $ = id => document.getElementById(id);
 let RAW = {mat:[], fer:[], epi:[], log:[]};
-const STORAGE_KEY = 'relatorio_consumo_dados';
 let FIL = {mat:[], fer:[], epi:[], log:[]};
 let FLAT = [];
 let sortK = 'data', sortD = 1;
 const CH = {};
 
-/* ══ STORAGE ═══════════════════════════════════════════════════════ */
-function saveData(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(RAW));
-}
-
-function loadSavedData(){
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if(!saved) return false;
-  try{
-    const parsed = JSON.parse(saved);
-    // Reconverte datas
-    ['mat','fer','epi','log'].forEach(tipo=>{
-      parsed[tipo] = (parsed[tipo] || []).map(r=>({
-        ...r,
-        data: r.data ? new Date(r.data) : null
-      }));
-    });
-    RAW = parsed;
-    populateDDs();
-    applyF();
-    toast('Dados carregados automaticamente.');
-    return true;
-  }catch(err){
-    console.error(err);
-    return false;
-  }
-} 
-
 /* ══ UTILS ══════════════════════════════════════════════════════════ */
 const fmt   = n => Number(n||0).toLocaleString('pt-BR');
 const fmtR  = n => 'R$ ' + Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const clamp = (v,a,b) => Math.min(b,Math.max(a,v));
- 
+
 function toast(msg, err=false){
   const t=$('toast'); $('tmsg').textContent=msg;
   t.className = err?'err show':'show';
   clearTimeout(t._t); t._t=setTimeout(()=>t.className='',3000);
 }
- 
+
 /* ══ DATE ══════════════════════════════════════════════════════════ */
 $('hdate').textContent = new Date().toLocaleDateString('pt-BR');
- 
+
 /* ══ NAV ═══════════════════════════════════════════════════════════ */
 function goTo(id){
   document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -674,7 +691,7 @@ window.addEventListener('scroll',()=>{
   SECS.forEach((id,i)=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<=130)cur=i;});
   TABS.forEach((t,i)=>t.classList.toggle('on',i===cur));
 },{passive:true});
- 
+
 /* ══ PARSE DATE ════════════════════════════════════════════════════ */
 function pd(v){
   if(!v)return null;
@@ -684,8 +701,12 @@ function pd(v){
   if(m)return new Date(+m[3],+m[2]-1,+m[1]);
   const d=new Date(s); return isNaN(d.getTime())?null:d;
 }
- 
-/* ══ IMPORT XLSX ════════════════════════════════════════════════════ */
+
+/* ══ IMPORT XLSX ════════════════════════════════════════════════════
+   Aba "Dados"  cols: DATA | MAT-ITEM | MAT-SAIDAS | COLAB-MAT | FUNCAO | SETOR | DATA | FERR | FERR-SAIDAS | COLAB-FERR | FUNCAO | SETOR
+   Aba "EPIs"   cols: DATA | EPI-NOME | PRECO | EPI-SAIDAS | SETOR | COLABORADOR | FUNCAO | UNIDADE
+   Aba "Logística" cols: DATA | UNIDADE | MATERIAIS ENVIADOS | TIPO DE ENVIO
+══════════════════════════════════════════════════════════════════ */
 $('file-input').addEventListener('change',function(e){
   const file=e.target.files[0]; if(!file)return;
   const reader=new FileReader();
@@ -693,24 +714,25 @@ $('file-input').addEventListener('change',function(e){
     try{
       const wb=XLSX.read(ev.target.result,{type:'binary',cellDates:true});
       parseSheets(wb);
-      saveData();
       toast(`✓ Importado: ${RAW.mat.length} materiais · ${RAW.fer.length} ferramentas · ${RAW.epi.length} EPIs · ${RAW.log.length} logística`);
     }catch(err){toast('Erro ao ler XLSX. Verifique o arquivo.',true);}
   };
   reader.readAsBinaryString(file);
   e.target.value='';
 });
- 
+
 function parseSheets(wb){
   RAW={mat:[],fer:[],epi:[],log:[]};
- 
+
   /* ─ Aba Dados ─ */
   const dadosName = wb.SheetNames.find(n=>/dados/i.test(n));
   if(dadosName){
     const ws=wb.Sheets[dadosName];
     const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
+    // skip header row (row 0)
     for(let i=1;i<rows.length;i++){
       const r=rows[i];
+      // Materiais: cols 0-5
       if(r[1]!=null){
         RAW.mat.push({
           data:    pd(r[0]),
@@ -721,6 +743,7 @@ function parseSheets(wb){
           setor:   String(r[5]||'').trim(),
         });
       }
+      // Ferramentas: cols 6-11
       if(r[7]!=null){
         RAW.fer.push({
           data:    pd(r[6]),
@@ -733,7 +756,7 @@ function parseSheets(wb){
       }
     }
   }
- 
+
   /* ─ Aba EPIs ─ */
   const episName = wb.SheetNames.find(n=>/epi/i.test(n));
   if(episName){
@@ -755,7 +778,7 @@ function parseSheets(wb){
       }
     }
   }
- 
+
   /* ─ Aba Logística ─ */
   const logName = wb.SheetNames.find(n=>/log/i.test(n));
   if(logName){
@@ -773,11 +796,11 @@ function parseSheets(wb){
       }
     }
   }
- 
+
   populateDDs();
   applyF();
 }
- 
+
 /* ══ POPULATE DROPDOWNS ════════════════════════════════════════════ */
 function populateDDs(){
   const uniq = (arr,fn) => [...new Set(arr.map(fn).filter(Boolean))].sort();
@@ -793,7 +816,7 @@ function populateDDs(){
   fill('flu',uniq(RAW.log,r=>r.unidade));
   fill('fte',uniq(RAW.log,r=>r.tipo));
 }
- 
+
 /* ══ FILTERS ════════════════════════════════════════════════════════ */
 let filOn=true;
 function toggleF(){
@@ -801,29 +824,19 @@ function toggleF(){
   $('fbody').style.display=filOn?'':'none';
   $('ftbtn').textContent=filOn?'▲ Ocultar':'▼ Mostrar';
 }
- 
+
 function applyF(){
   const ds=$('fds').value, de=$('fde').value;
   const fset=$('fset').value, fcm=$('fcm').value, fce=$('fce').value;
   const fun=$('fun').value, flu=$('flu').value, fte=$('fte').value;
- 
+
   const dateOk=(d,ds,de)=>{
     if(!d)return true;
-    const dt = new Date(d);
-    dt.setHours(0,0,0,0);
-    if(ds){
-      const start = new Date(ds);
-      start.setMinutes(start.getMinutes() + start.getTimezoneOffset());
-      if(dt < start) return false;
-    }
-    if(de){
-      const end = new Date(de);
-      end.setMinutes(end.getMinutes() + end.getTimezoneOffset());
-      if(dt > end) return false;
-    }
+    if(ds && d<new Date(ds))return false;
+    if(de && d>new Date(de+'T23:59:59'))return false;
     return true;
   };
- 
+
   FIL.mat = RAW.mat.filter(r=>
     dateOk(r.data,ds,de) &&
     (!fset||r.setor===fset) &&
@@ -843,25 +856,25 @@ function applyF(){
     (!flu||r.unidade===flu) &&
     (!fte||r.tipo===fte)
   );
- 
+
   const total = FIL.mat.length+FIL.fer.length+FIL.epi.length+FIL.log.length;
   $('hcount').textContent = fmt(total);
   renderAll();
 }
- 
+
 function resetF(){
   ['fds','fde'].forEach(id=>$(id).value='');
   ['fset','fcm','fce','fun','flu','fte'].forEach(id=>$(id).value='');
   applyF();
 }
- 
+
 /* ══ TOP-N ══════════════════════════════════════════════════════════ */
 function topN(arr,kFn,vFn=()=>1,n=7){
   const m={};
   arr.forEach(r=>{const k=kFn(r);if(k&&k!=='-')m[k]=(m[k]||0)+vFn(r);});
   return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,n);
 }
- 
+
 /* ══ RENDER RANK LIST ═══════════════════════════════════════════════ */
 function rRank(id,entries,bc=''){
   const el=$(id);
@@ -875,7 +888,7 @@ function rRank(id,entries,bc=''){
       <span class="rbadge ${bc}">${fmt(vl)}</span>
     </div>`).join('');
 }
- 
+
 /* ══ RENDER PROGRESS ════════════════════════════════════════════════ */
 function rProg(id,entries,color='#057A55'){
   const el=$(id);
@@ -887,12 +900,12 @@ function rProg(id,entries,color='#057A55'){
       <div class="pi-track"><div class="pi-fill" style="width:${clamp(vl/max*100,2,100)}%;background:${color}"></div></div>
     </div>`).join('');
 }
- 
+
 /* ══ CHARTS ══════════════════════════════════════════════════════════ */
 const PAL=['#7BB6E0','#113D63','#01223E','#057A55','#D97706','#C8001A','#6427C2','#0EA5E9','#84CC16'];
- 
+
 function dCh(id){if(CH[id]){CH[id].destroy();delete CH[id];}}
- 
+
 function rBar(cid,eid,labels,data,color='#113D63'){
   const c=$(cid),e=$(eid);
   if(!labels.length){c.style.display='none';e.style.display='flex';dCh(cid);return;}
@@ -904,7 +917,7 @@ function rBar(cid,eid,labels,data,color='#113D63'){
                y:{grid:{color:'#E8EEF5'},ticks:{font:{size:10,family:"'DM Mono'"}}}}
     }});
 }
- 
+
 function rDonut(cid,eid,labels,data){
   const c=$(cid),e=$(eid);
   if(!labels.length){c.style.display='none';e.style.display='flex';dCh(cid);return;}
@@ -915,7 +928,7 @@ function rDonut(cid,eid,labels,data){
       plugins:{legend:{position:'right',labels:{font:{size:10},boxWidth:12,padding:10}}}}
   });
 }
- 
+
 function rLine(cid,eid,labels,data,color='#057A55'){
   const c=$(cid),e=$(eid);
   if(!labels.length){c.style.display='none';e.style.display='flex';dCh(cid);return;}
@@ -928,11 +941,11 @@ function rLine(cid,eid,labels,data,color='#057A55'){
                y:{grid:{color:'#E8EEF5'},ticks:{font:{size:10,family:"'DM Mono'"}}}}
     }});
 }
- 
+
 /* ══ RENDER ALL ══════════════════════════════════════════════════════ */
 function renderAll(){
   const M=FIL.mat, F=FIL.fer, E=FIL.epi, L=FIL.log;
- 
+
   /* ─ Strip ─ */
   $('ss0').textContent=fmt(M.length+F.length+E.length+L.length);
   $('ss1').textContent=fmt(M.length);
@@ -942,7 +955,7 @@ function renderAll(){
   const gastoEPI=E.reduce((s,r)=>s+r.preco*r.qtd,0);
   $('ss5').textContent=fmtR(gastoEPI);
   $('ss6').textContent=fmt(L.length);
- 
+
   /* ─ Materiais ─ */
   $('cm-cnt').textContent=fmt(M.length)+' registros';
   $('mk1').textContent=fmt(M.length);
@@ -954,7 +967,7 @@ function renderAll(){
   rRank('m-colab',topN(M,r=>r.colab,r=>r.qtd||1));
   const mSet=topN(M,r=>r.setor,r=>r.qtd||1,8);
   rBar('ch-m-set','ce-m-set',mSet.map(e=>e[0]),mSet.map(e=>e[1]),'#113D63');
- 
+
   /* ─ Ferramentas ─ */
   $('cf-cnt').textContent=fmt(F.length)+' registros';
   $('fk1').textContent=fmt(F.length);
@@ -964,7 +977,7 @@ function renderAll(){
   $('fk4').textContent=ftC[0]?.[0]||'—'; $('fk4s').textContent=ftC[0]?fmt(ftC[0][1])+' retiradas':'';
   rRank('f-items',topN(F,r=>r.item,r=>r.qtd||1),'am');
   rRank('f-colab',topN(F,r=>r.colab,r=>r.qtd||1),'am');
- 
+
   /* ─ EPIs ─ */
   $('ce-cnt').textContent=fmt(E.length)+' registros';
   $('ek1').textContent=fmtR(gastoEPI);
@@ -982,7 +995,7 @@ function renderAll(){
   const dks=Object.keys(byDay).sort((a,b)=>{const pa=a.split('/'),pb=b.split('/');return new Date(+pa[2],+pa[1]-1,+pa[0])-new Date(+pb[2],+pb[1]-1,+pb[0]);});
   rLine('ch-e-dia','ce-e-dia',dks,dks.map(k=>+byDay[k].toFixed(2)));
   rRank('e-colab',topN(E,r=>r.colab,r=>r.qtd||1),'gr');
- 
+
   /* ─ Logística ─ */
   $('cl-cnt').textContent=fmt(L.length)+' registros';
   const ltU=topN(L,r=>r.unidade,()=>1,1), ltM=topN(L,r=>r.material,()=>1,1), ltT=topN(L,r=>r.tipo,()=>1,1);
@@ -995,12 +1008,12 @@ function renderAll(){
   rBar('ch-l-mat','ce-l-mat',lMat.map(e=>e[0]),lMat.map(e=>e[1]),'#6427C2');
   const lTip=topN(L,r=>r.tipo,()=>1,6);
   rDonut('ch-l-tipo','ce-l-tipo',lTip.map(e=>e[0]),lTip.map(e=>e[1]));
- 
+
   /* ─ Tabela ─ */
   buildFlat();
   renderTable();
 }
- 
+
 /* ══ FLAT TABLE ═════════════════════════════════════════════════════ */
 function buildFlat(){
   FLAT=[];
@@ -1010,7 +1023,7 @@ function buildFlat(){
   FIL.log.forEach(r=>FLAT.push({tipo:'Logística',data:r.data,item:r.material,colab:r.tipo,funcao:'—',setor:'—',unidade:r.unidade,qtd:0,preco:0,total:0}));
   $('ct-cnt').textContent=fmt(FLAT.length)+(FLAT.length>500?' (500 exibidos)':'');
 }
- 
+
 function renderTable(){
   const sorted=[...FLAT].sort((a,b)=>{
     let av=a[sortK],bv=b[sortK];
@@ -1036,9 +1049,9 @@ function renderTable(){
     <td style="text-align:right;font-family:'DM Mono',monospace;font-weight:600">${r.total?fmtR(r.total):'—'}</td>
   </tr>`).join('');
 }
- 
+
 function srt(k){if(sortK===k)sortD*=-1;else{sortK=k;sortD=1;}renderTable();}
- 
+
 /* ══ EXPORT CSV ═════════════════════════════════════════════════════ */
 function exportCSV(){
   const hdr=['Tipo','Data','Item','Colaborador','Função','Setor','Unidade','Qtd','Preço Unit.','Total'];
@@ -1053,23 +1066,23 @@ function exportCSV(){
   a.click();
   toast('CSV exportado.');
 }
- 
+
 /* ══ CLEAR ══════════════════════════════════════════════════════════ */
 function clearAll(){
-  if(!confirm('Deseja realmente apagar todos os dados?')) return;
   RAW={mat:[],fer:[],epi:[],log:[]};
   FIL={mat:[],fer:[],epi:[],log:[]};
   FLAT=[];
-  localStorage.removeItem(STORAGE_KEY);
   populateDDs();
   renderAll();
   $('hcount').textContent='0';
-  toast('Todos os dados foram apagados.');
+  toast('Dados limpos.');
 }
- 
+
 /* ══ TEMPLATE ═══════════════════════════════════════════════════════ */
 function dlTemplate(){
   const wb=XLSX.utils.book_new();
+
+  // Aba Dados
   const d=[
     ['DATA','MATERIAIS - ITEM','MATERIAIS - SAÍDAS','COLABORADOR MATERIAIS - NOME','FUNÇÃO','SETOR','DATA','FERRAMENTAS - FERRAMENTA','FERRAMENTAS - SAÍDAS','COLABORADOR FERRAMENTAS - NOME','FUNÇÃO','SETOR'],
     ['22/04/2026','TRAPO BRANCO',25,'ALEXANDRO','HIDROJATO','HIDROJATO','04/04/2026','CHAVE MANDRIL',1,'CARLOS CAETANO','PINTOR','PINTURA'],
@@ -1077,6 +1090,8 @@ function dlTemplate(){
     ['22/04/2026','TRINCHA 1"',24,'CARLOS CAETANO','PINTOR','PINTURA','','','','','',''],
   ];
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(d),'Dados');
+
+  // Aba EPIs
   const e=[
     ['DATA','EPI - NOME','preço','EPI - SAÍDAS','SETOR','COLABORADOR','FUNÇÃO','UNIDADE'],
     ['04/05/2026','MACACÃO DE SEGURANÇA - RF',12.85,1,'PRODUÇÃO','SIDINEI SILVA MENEZES','SOLDADOR','-'],
@@ -1084,6 +1099,8 @@ function dlTemplate(){
     ['14/05/2026','OCULOS DE SEG. INCOLOR ESPELHADO',22.85,2,'OFFSHORE','-','-','POLVO A'],
   ];
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(e),'EPIs');
+
+  // Aba Logística
   const l=[
     ['DATA','UNIDADE','MATERIAIS ENVIADOS','TIPO DE ENVIO'],
     ['04/05/2026','POLVO A','EPI','VOO'],
@@ -1091,10 +1108,116 @@ function dlTemplate(){
     ['06/05/2026','ALPHA STAR','FERRAMENTA','BARCO'],
   ];
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(l),'Logística');
+
   XLSX.writeFile(wb,'template_painel_lotes.xlsx');
   toast('Template baixado!');
 }
- 
+
+/* ══ COMPARTILHAR (URL com dados embutidos) ══════════════════════════
+   Serializa RAW para JSON → comprime com LZ-string → codifica em Base64
+   → coloca no hash da URL. Quem abre o link, decodifica e restaura os dados.
+═══════════════════════════════════════════════════════════════════════ */
+
+/* LZ-String minificado (compressão leve para URLs) */
+var LZString=(function(){function o(r,o){if(!t[r]){t[r]={};for(var n=0;n<r.length;n++)t[r][r.charAt(n)]=n}return t[r][o]}var r=String.fromCharCode,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",e="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",t={},i={compressToBase64:function(r){if(null==r)return"";var o=i._compress(r,6,function(r){return n.charAt(r)});switch(o.length%4){default:case 0:return o;case 1:return o+"===";case 2:return o+"==";case 3:return o+"="}},decompressFromBase64:function(r){return null==r?"":""==r?null:i._decompress(r.length,32,function(o){return o(n,r)})},compressToEncodedURIComponent:function(r){return null==r?"":i._compress(r,6,function(r){return e.charAt(r)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:(r=r.replace(/ /g,"+"),i._decompress(r.length,32,function(o){return o(e,r)}))},compress:function(r){return i._compress(r,16,function(r){return String.fromCharCode(r)})},decompress:function(r){return null==r?"":""==r?null:i._decompress(r.length,32768,function(o){return o(r,0)})},_compress:function(r,o,n){if(null==r)return"";var e,t,i,s={},p={},u="",a="",c="",l=2,f=3,h=2,d=[],m=0,v=0;for(i=0;i<r.length;i+=1){u=r.charAt(i);Object.prototype.hasOwnProperty.call(s,u)||(s[u]=f++,p[u]=!0);a=c+u;if(Object.prototype.hasOwnProperty.call(s,a))c=a;else{if(Object.prototype.hasOwnProperty.call(p,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m=m<<1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}l--,0==l&&(l=Math.pow(2,h),h++);delete p[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;l--,0==l&&(l=Math.pow(2,h),h++);s[a]=f++,c=String(u)}}if(""!==c){if(Object.prototype.hasOwnProperty.call(p,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m=m<<1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}l--,0==l&&(l=Math.pow(2,h),h++);delete p[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;l--,0==l&&(l=Math.pow(2,h),h++)}for(t=2,e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;for(;;){if(m=m<<1,v==o-1){d.push(n(m));break}v++}return d.join("")},_decompress:function(r,o,n){var e,t,i,s,p,u,a,c=[],l=4,f=4,h=3,d="",m=[],v={val:n(0),position:o,index:1};for(t=0;t<3;t+=1)c[t]=t;for(i=0,p=Math.pow(2,2),u=1;u!=p;)s=v.val&v.position,v.position>>=1,0==v.position&&(v.position=o,v.val=n(v.index++)),i|=(s>0?1:0)*u,u<<=1;switch(e=i){case 0:for(i=0,p=Math.pow(2,8),u=1;u!=p;)s=v.val&v.position,v.position>>=1,0==v.position&&(v.position=o,v.val=n(v.index++)),i|=(s>0?1:0)*u,u<<=1;a=r(i);break;case 1:for(i=0,p=Math.pow(2,16),u=1;u!=p;)s=v.val&v.position,v.position>>=1,0==v.position&&(v.position=o,v.val=n(v.index++)),i|=(s>0?1:0)*u,u<<=1;a=r(i);break;case 2:return""}for(c[3]=a,d=a,m.push(a);;){if(v.index>r)return"";for(i=0,p=Math.pow(2,h),u=1;u!=p;)s=v.val&v.position,v.position>>=1,0==v.position&&(v.position=o,v.val=n(v.index++)),i|=(s>0?1:0)*u,u<<=1;switch(a=i){case 0:for(i=0,p=Math.pow(2,8),u=1;u!=p;)s=v.val&v.position,v.position>>=1,0==v.position&&(v.position=o,v.val=n(v.index++)),i|=(s>0?1:0)*u,u<<=1;c[f++]=r(i),a=f-1,l--;break;case 1:for(i=0,p=Math.pow(2,16),u=1;u!=p;)s=v.val&v.position,v.position>>=1,0==v.position&&(v.position=o,v.val=n(v.index++)),i|=(s>0?1:0)*u,u<<=1;c[f++]=r(i),a=f-1,l--;break;case 2:return m.join("")}if(0==l&&(l=Math.pow(2,h),h++),c[a])d=c[a];else{if(a!==f)return null;d=e+e.charAt(0)}m.push(d),c[f++]=e+d.charAt(0),l--,0==l&&(l=Math.pow(2,h),h++),e=d}return m.join("")}};return i})();
+
+function rawToJSON(){
+  // Serializa datas como string ISO
+  const ser=(arr)=>arr.map(r=>{
+    const o={...r};
+    if(o.data instanceof Date && !isNaN(o.data)) o.data=o.data.toISOString();
+    return o;
+  });
+  return JSON.stringify({mat:ser(RAW.mat),fer:ser(RAW.fer),epi:ser(RAW.epi),log:ser(RAW.log)});
+}
+
+function jsonToRaw(json){
+  const deser=(arr)=>arr.map(r=>{
+    const o={...r};
+    if(o.data && typeof o.data==='string') o.data=new Date(o.data);
+    return o;
+  });
+  const p=JSON.parse(json);
+  return {mat:deser(p.mat||[]),fer:deser(p.fer||[]),log:deser(p.log||[]),epi:deser(p.epi||[])};
+}
+
+function gerarLink(){
+  const total=RAW.mat.length+RAW.fer.length+RAW.epi.length+RAW.log.length;
+  const status=$('share-status'), urlInput=$('share-url'), warn=$('share-warn');
+  if(total===0){
+    status.textContent='⚠️ Nenhum dado para compartilhar. Importe um XLSX primeiro.';
+    urlInput.value='';
+    return;
+  }
+  status.textContent='⏳ Comprimindo dados...';
+  setTimeout(()=>{
+    try{
+      const json=rawToJSON();
+      const compressed=LZString.compressToEncodedURIComponent(json);
+      const base=window.location.origin+window.location.pathname;
+      const url=base+'?d='+compressed;
+      urlInput.value=url;
+      const kb=Math.round(url.length/1024*10)/10;
+      status.textContent=`✅ Link gerado! ${total} registros · ${kb} KB`;
+      warn.style.display = url.length>8000 ? 'block' : 'none';
+    }catch(e){
+      status.textContent='❌ Erro ao gerar link.';
+    }
+  },50);
+}
+
+function openShare(){
+  const ov=$('share-overlay');
+  ov.style.display='flex';
+  $('share-status').textContent='';
+  $('share-url').value='';
+  $('share-warn').style.display='none';
+  gerarLink();
+}
+
+function closeShare(){ $('share-overlay').style.display='none'; }
+
+function copyLink(){
+  const url=$('share-url').value;
+  if(!url)return;
+  navigator.clipboard.writeText(url).then(()=>{
+    const btn=$('copy-btn');
+    btn.textContent='✓ Copiado!';
+    btn.style.background='var(--green)';
+    setTimeout(()=>{btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar';btn.style.background='';},2500);
+    toast('Link copiado para a área de transferência!');
+  }).catch(()=>{
+    $('share-url').select();
+    document.execCommand('copy');
+    toast('Link copiado!');
+  });
+}
+
+function shareWA(){
+  const url=$('share-url').value;
+  if(!url){toast('Gere o link primeiro.',true);return;}
+  const txt=encodeURIComponent('Painel de Controle de Lotes:\n'+url);
+  window.open('https://wa.me/?text='+txt,'_blank');
+}
+
+/* ── Ao carregar: verifica se há dados na URL ── */
+(function loadFromURL(){
+  const params=new URLSearchParams(window.location.search);
+  const d=params.get('d');
+  if(!d)return;
+  try{
+    const json=LZString.decompressFromEncodedURIComponent(d);
+    if(!json)throw new Error('decompress failed');
+    RAW=jsonToRaw(json);
+    populateDDs();
+    applyF();
+    const total=RAW.mat.length+RAW.fer.length+RAW.epi.length+RAW.log.length;
+    toast(`✅ Dados carregados do link compartilhado! (${total} registros)`);
+  }catch(e){
+    toast('Não foi possível carregar dados do link.',true);
+  }
+})();
+
 /* ══ DEMO DATA ══════════════════════════════════════════════════════ */
 function loadDemo(){
   const itMat=['TRAPO BRANCO','LIXA DE 100','TRINCHA 1"','ROLO DE ESPUMA 5CM','VARETA ER70S-3 3,2MM','ARREBITE 3,2MM','DISCO DE CORTE 4.5"','PANO DE LIMPEZA','FITA ADESIVA','TINTA EPÓXI'];
@@ -1106,10 +1229,10 @@ function loadDemo(){
   const setM=['HIDROJATO','PINTURA','PRODUÇÃO','CALDEIRARIA'];
   const setE=['PRODUÇÃO','HIDROJATO','OFFSHORE'];
   const unis=['POLVO A','ALPHA STAR','FRADE','HUNTER'];
-  const precos=[12.85,14.85,15.85,22.85,10.00,45.00,32.00];
-  
+  const precos=[12.85,14.85,15.85,22.85,21.85,19.85,29.90];
+
   RAW.mat=[];RAW.fer=[];RAW.epi=[];RAW.log=[];
- 
+
   for(let i=0;i<30;i++){
     const d=new Date(2026,3,Math.floor(Math.random()*22)+1);
     RAW.mat.push({data:d,item:itMat[i%itMat.length],qtd:Math.floor(Math.random()*100)+5,colab:colM[i%colM.length],funcao:'OPERADOR',setor:setM[i%setM.length]});
@@ -1127,17 +1250,10 @@ function loadDemo(){
   for(let i=0;i<7;i++){
     RAW.log.push({data:new Date(2026,4,i+4),unidade:unis[i%unis.length],material:mEnv[i%mEnv.length],tipo:tipoEnv[i%tipoEnv.length]});
   }
- 
-  populateDDs();
-  applyF();
-  saveData();
+
+  populateDDs();applyF();
   toast(`✓ Demo: ${RAW.mat.length} mat · ${RAW.fer.length} fer · ${RAW.epi.length} EPIs · ${RAW.log.length} log`);
 }
-
-/* ══ AUTO LOAD ════════════════════════════════════════════════════ */
-window.addEventListener('load', () => {
-  loadSavedData();
-});
 </script>
 </body>
 </html>
