@@ -1155,7 +1155,7 @@ function gerarLink(){
       const json=rawToJSON();
       const compressed=LZString.compressToEncodedURIComponent(json);
       const base=window.location.origin+window.location.pathname;
-      const url=base+'?d='+compressed;
+      const url=base+'#d='+compressed;
       urlInput.value=url;
       const kb=Math.round(url.length/1024*10)/10;
       status.textContent=`✅ Link gerado! ${total} registros · ${kb} KB`;
@@ -1200,23 +1200,28 @@ function shareWA(){
   window.open('https://wa.me/?text='+txt,'_blank');
 }
 
-/* ── Ao carregar: verifica se há dados na URL ── */
-(function loadFromURL(){
-  const params=new URLSearchParams(window.location.search);
-  const d=params.get('d');
-  if(!d)return;
+/* ── Ao carregar: verifica se há dados no hash da URL ── */
+function loadFromURL(){
+  const hash = window.location.hash; // ex: #d=xyz...
+  if(!hash || !hash.startsWith('#d=')) return;
+  const compressed = hash.slice(3); // remove '#d='
+  if(!compressed) return;
   try{
-    const json=LZString.decompressFromEncodedURIComponent(d);
+    const json=LZString.decompressFromEncodedURIComponent(compressed);
     if(!json)throw new Error('decompress failed');
     RAW=jsonToRaw(json);
     populateDDs();
     applyF();
     const total=RAW.mat.length+RAW.fer.length+RAW.epi.length+RAW.log.length;
-    toast(`✅ Dados carregados do link compartilhado! (${total} registros)`);
+    // limpa o hash da URL sem recarregar a página
+    history.replaceState(null,'',window.location.pathname);
+    toast(`✅ Dados carregados do link! (${total} registros)`);
   }catch(e){
-    toast('Não foi possível carregar dados do link.',true);
+    toast('Não foi possível carregar os dados do link.',true);
   }
-})();
+}
+// Roda depois que tudo estiver inicializado
+window.addEventListener('DOMContentLoaded', loadFromURL);
 
 /* ══ DEMO DATA ══════════════════════════════════════════════════════ */
 function loadDemo(){
