@@ -665,28 +665,29 @@ let FIL = {mat:[], fer:[], epi:[], log:[]};
 let FLAT = [];
 let sortK = 'data', sortD = 1;
 const CH = {};
+const LS_KEY = 'painel_lotes_v3';
 
 /* ══ UTILS ══════════════════════════════════════════════════════════ */
 const fmt   = n => Number(n||0).toLocaleString('pt-BR');
 const fmtR  = n => 'R$ ' + Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const clamp = (v,a,b) => Math.min(b,Math.max(a,v));
 
-function toast(msg, err=false){
+function toast(msg, err=false, dur=3500){
   const t=$('toast'); $('tmsg').textContent=msg;
   t.className = err?'err show':'show';
-  clearTimeout(t._t); t._t=setTimeout(()=>t.className='',3000);
+  clearTimeout(t._t); t._t=setTimeout(()=>t.className='',dur);
 }
 
 /* ══ DATE ══════════════════════════════════════════════════════════ */
-$('hdate').textContent = new Date().toLocaleDateString('pt-BR');
+// definido dentro do DOMContentLoaded principal
 
 /* ══ NAV ═══════════════════════════════════════════════════════════ */
 function goTo(id){
   document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
 }
-const SECS = ['sm','sf','se','sl','st'];
-const TABS = document.querySelectorAll('.ntab');
 window.addEventListener('scroll',()=>{
+  const SECS=['sm','sf','se','sl','st'];
+  const TABS=document.querySelectorAll('.ntab');
   let cur=0;
   SECS.forEach((id,i)=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<=130)cur=i;});
   TABS.forEach((t,i)=>t.classList.toggle('on',i===cur));
@@ -799,6 +800,37 @@ function parseSheets(wb){
 
   populateDDs();
   applyF();
+  saveLS();
+}
+
+/* ══ LOCAL STORAGE — dados não somem ao atualizar ══════════════════ */
+function saveLS(){
+  try{
+    const ser=(arr)=>arr.map(r=>{
+      const o={...r};
+      if(o.data instanceof Date && !isNaN(o.data)) o.data=o.data.toISOString();
+      return o;
+    });
+    const payload=JSON.stringify({mat:ser(RAW.mat),fer:ser(RAW.fer),epi:ser(RAW.epi),log:ser(RAW.log)});
+    localStorage.setItem(LS_KEY, payload);
+  }catch(e){ console.warn('localStorage indisponível',e); }
+}
+
+function loadLS(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    const p=JSON.parse(raw);
+    const deser=(arr)=>(arr||[]).map(r=>{
+      const o={...r};
+      if(o.data && typeof o.data==='string') o.data=new Date(o.data);
+      return o;
+    });
+    RAW={mat:deser(p.mat),fer:deser(p.fer),epi:deser(p.epi),log:deser(p.log)};
+    const total=RAW.mat.length+RAW.fer.length+RAW.epi.length+RAW.log.length;
+    if(total===0) return false;
+    return true;
+  }catch(e){ return false; }
 }
 
 /* ══ POPULATE DROPDOWNS ════════════════════════════════════════════ */
@@ -1072,6 +1104,7 @@ function clearAll(){
   RAW={mat:[],fer:[],epi:[],log:[]};
   FIL={mat:[],fer:[],epi:[],log:[]};
   FLAT=[];
+  try{ localStorage.removeItem(LS_KEY); }catch(e){}
   populateDDs();
   renderAll();
   $('hcount').textContent='0';
@@ -1118,7 +1151,127 @@ function dlTemplate(){
    → coloca no hash da URL. Quem abre o link, decodifica e restaura os dados.
 ═══════════════════════════════════════════════════════════════════════ */
 
-/* LZ-String minificado (compressão leve para URLs) */
+/* ══ COMPARTILHAR ════════════════════════════════════════════════════ */
+
+function rawToJSON(){
+  const ser=(arr)=>arr.map(r=>{
+    const o={...r};
+    if(o.data instanceof Date && !isNaN(o.data)) o.data=o.data.toISOString();
+    return o;
+  });
+  return JSON.stringify({mat:ser(RAW.mat),fer:ser(RAW.fer),epi:ser(RAW.epi),log:ser(RAW.log)});
+}
+
+function jsonToRaw(json){
+  const deser=(arr)=>(arr||[]).map(r=>{
+    const o={...r};
+    if(o.data && typeof o.data==='string') o.data=new Date(o.data);
+    return o;
+  });
+  const p=JSON.parse(json);
+  return {mat:deser(p.mat),fer:deser(p.fer),epi:deser(p.epi),log:deser(p.log)};
+}
+
+function gerarLink(){
+  const total=RAW.mat.length+RAW.fer.length+RAW.epi.length+RAW.log.length;
+  const status=$('share-status'), urlInput=$('share-url'), warn=$('share-warn');
+  if(total===0){
+    status.textContent='⚠️ Nenhum dado. Importe um XLSX primeiro.';
+    urlInput.value='';
+    return;
+  }
+  status.textContent='⏳ Comprimindo...';
+  setTimeout(()=>{
+    try{
+      const json=rawToJSON();
+      const compressed=LZString.compressToEncodedURIComponent(json);
+      // Usa hash (#) — nunca é removido por redirecionamentos do GitHub Pages
+      const base=window.location.origin+window.location.pathname;
+      const url=base+'#d='+compressed;
+      urlInput.value=url;
+      const kb=Math.round(url.length/1024*10)/10;
+      status.textContent=`✅ ${total} registros · ${kb} KB`;
+      warn.style.display=url.length>8000?'block':'none';
+    }catch(e){
+      status.textContent='❌ Erro ao gerar link: '+e.message;
+    }
+  },60);
+}
+
+function openShare(){
+  $('share-overlay').style.display='flex';
+  $('share-status').textContent='';
+  $('share-url').value='';
+  $('share-warn').style.display='none';
+  gerarLink();
+}
+function closeShare(){ $('share-overlay').style.display='none'; }
+
+function copyLink(){
+  const url=$('share-url').value;
+  if(!url) return;
+  const btn=$('copy-btn');
+  const done=()=>{
+    btn.innerHTML='✓ Copiado!';
+    btn.style.background='var(--green)';
+    setTimeout(()=>{
+      btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar';
+      btn.style.background='';
+    },2500);
+    toast('✅ Link copiado!');
+  };
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(done).catch(()=>{
+      $('share-url').select(); document.execCommand('copy'); done();
+    });
+  } else {
+    $('share-url').select(); document.execCommand('copy'); done();
+  }
+}
+
+function shareWA(){
+  const url=$('share-url').value;
+  if(!url){ toast('Gere o link primeiro.',true); return; }
+  window.open('https://wa.me/?text='+encodeURIComponent('📊 Painel de Controle de Lotes:\n'+url),'_blank');
+}
+
+/* ══ INICIALIZAÇÃO — ordem correta ══════════════════════════════════
+   1. Tenta carregar do hash (link compartilhado) — prioridade máxima
+   2. Se não tiver hash, tenta carregar do localStorage (sessão anterior)
+   3. Se não tiver nada, inicia vazio
+════════════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function(){
+  $('hdate').textContent = new Date().toLocaleDateString('pt-BR');
+
+  const hash = window.location.hash || '';
+
+  if(hash.startsWith('#d=')){
+    // ── Carrega do link compartilhado ──
+    const compressed = hash.slice(3);
+    try{
+      const json = LZString.decompressFromEncodedURIComponent(compressed);
+      if(!json) throw new Error('Falha na descompressão');
+      RAW = jsonToRaw(json);
+      const total = RAW.mat.length+RAW.fer.length+RAW.epi.length+RAW.log.length;
+      if(total === 0) throw new Error('Dados vazios');
+      // Limpa o hash da URL (estético, não recarrega)
+      history.replaceState(null, '', window.location.pathname);
+      populateDDs();
+      applyF();
+      saveLS(); // salva localmente também
+      toast(`✅ Dados carregados do link! (${total} registros)`, false, 5000);
+    }catch(e){
+      toast('⚠️ Não foi possível carregar o link: '+e.message, true, 5000);
+    }
+  } else if(loadLS()){
+    // ── Restaura do localStorage ──
+    const total = RAW.mat.length+RAW.fer.length+RAW.epi.length+RAW.log.length;
+    populateDDs();
+    applyF();
+    toast(`📂 Dados restaurados (${total} registros)`);
+  }
+  // Senão: página em branco, aguarda importação
+});
 var LZString=(function(){function o(r,o){if(!t[r]){t[r]={};for(var n=0;n<r.length;n++)t[r][r.charAt(n)]=n}return t[r][o]}var r=String.fromCharCode,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",e="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",t={},i={compressToBase64:function(r){if(null==r)return"";var o=i._compress(r,6,function(r){return n.charAt(r)});switch(o.length%4){default:case 0:return o;case 1:return o+"===";case 2:return o+"==";case 3:return o+"="}},decompressFromBase64:function(r){return null==r?"":""==r?null:i._decompress(r.length,32,function(o){return o(n,r)})},compressToEncodedURIComponent:function(r){return null==r?"":i._compress(r,6,function(r){return e.charAt(r)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:(r=r.replace(/ /g,"+"),i._decompress(r.length,32,function(o){return o(e,r)}))},compress:function(r){return i._compress(r,16,function(r){return String.fromCharCode(r)})},decompress:function(r){return null==r?"":""==r?null:i._decompress(r.length,32768,function(o){return o(r,0)})},_compress:function(r,o,n){if(null==r)return"";var e,t,i,s={},p={},u="",a="",c="",l=2,f=3,h=2,d=[],m=0,v=0;for(i=0;i<r.length;i+=1){u=r.charAt(i);Object.prototype.hasOwnProperty.call(s,u)||(s[u]=f++,p[u]=!0);a=c+u;if(Object.prototype.hasOwnProperty.call(s,a))c=a;else{if(Object.prototype.hasOwnProperty.call(p,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m=m<<1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}l--,0==l&&(l=Math.pow(2,h),h++);delete p[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;l--,0==l&&(l=Math.pow(2,h),h++);s[a]=f++,c=String(u)}}if(""!==c){if(Object.prototype.hasOwnProperty.call(p,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m=m<<1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}l--,0==l&&(l=Math.pow(2,h),h++);delete p[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;l--,0==l&&(l=Math.pow(2,h),h++)}for(t=2,e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;for(;;){if(m=m<<1,v==o-1){d.push(n(m));break}v++}return d.join("")},_decompress:function(r,o,n){var e,t,i,s,p,u,a,c=[],l=4,f=4,h=3,d="",m=[],v={val:n(0),position:o,index:1};for(t=0;t<3;t+=1)c[t]=t;for(i=0,p=Math.pow(2,2),u=1;u!=p;)s=v.val&v.position,v.position>>=1,0==v.position&&(v.position=o,v.val=n(v.index++)),i|=(s>0?1:0)*u,u<<=1;switch(e=i){case 0:for(i=0,p=Math.pow(2,8),u=1;u!=p;)s=v.val&v.position,v.position>>=1,0==v.position&&(v.position=o,v.val=n(v.index++)),i|=(s>0?1:0)*u,u<<=1;a=r(i);break;case 1:for(i=0,p=Math.pow(2,16),u=1;u!=p;)s=v.val&v.position,v.position>>=1,0==v.position&&(v.position=o,v.val=n(v.index++)),i|=(s>0?1:0)*u,u<<=1;a=r(i);break;case 2:return""}for(c[3]=a,d=a,m.push(a);;){if(v.index>r)return"";for(i=0,p=Math.pow(2,h),u=1;u!=p;)s=v.val&v.position,v.position>>=1,0==v.position&&(v.position=o,v.val=n(v.index++)),i|=(s>0?1:0)*u,u<<=1;switch(a=i){case 0:for(i=0,p=Math.pow(2,8),u=1;u!=p;)s=v.val&v.position,v.position>>=1,0==v.position&&(v.position=o,v.val=n(v.index++)),i|=(s>0?1:0)*u,u<<=1;c[f++]=r(i),a=f-1,l--;break;case 1:for(i=0,p=Math.pow(2,16),u=1;u!=p;)s=v.val&v.position,v.position>>=1,0==v.position&&(v.position=o,v.val=n(v.index++)),i|=(s>0?1:0)*u,u<<=1;c[f++]=r(i),a=f-1,l--;break;case 2:return m.join("")}if(0==l&&(l=Math.pow(2,h),h++),c[a])d=c[a];else{if(a!==f)return null;d=e+e.charAt(0)}m.push(d),c[f++]=e+d.charAt(0),l--,0==l&&(l=Math.pow(2,h),h++),e=d}return m.join("")}};return i})();
 
 function rawToJSON(){
@@ -1200,29 +1353,6 @@ function shareWA(){
   window.open('https://wa.me/?text='+txt,'_blank');
 }
 
-/* ── Ao carregar: verifica se há dados no hash da URL ── */
-function loadFromURL(){
-  const hash = window.location.hash; // ex: #d=xyz...
-  if(!hash || !hash.startsWith('#d=')) return;
-  const compressed = hash.slice(3); // remove '#d='
-  if(!compressed) return;
-  try{
-    const json=LZString.decompressFromEncodedURIComponent(compressed);
-    if(!json)throw new Error('decompress failed');
-    RAW=jsonToRaw(json);
-    populateDDs();
-    applyF();
-    const total=RAW.mat.length+RAW.fer.length+RAW.epi.length+RAW.log.length;
-    // limpa o hash da URL sem recarregar a página
-    history.replaceState(null,'',window.location.pathname);
-    toast(`✅ Dados carregados do link! (${total} registros)`);
-  }catch(e){
-    toast('Não foi possível carregar os dados do link.',true);
-  }
-}
-// Roda depois que tudo estiver inicializado
-window.addEventListener('DOMContentLoaded', loadFromURL);
-
 /* ══ DEMO DATA ══════════════════════════════════════════════════════ */
 function loadDemo(){
   const itMat=['TRAPO BRANCO','LIXA DE 100','TRINCHA 1"','ROLO DE ESPUMA 5CM','VARETA ER70S-3 3,2MM','ARREBITE 3,2MM','DISCO DE CORTE 4.5"','PANO DE LIMPEZA','FITA ADESIVA','TINTA EPÓXI'];
@@ -1257,6 +1387,7 @@ function loadDemo(){
   }
 
   populateDDs();applyF();
+  saveLS();
   toast(`✓ Demo: ${RAW.mat.length} mat · ${RAW.fer.length} fer · ${RAW.epi.length} EPIs · ${RAW.log.length} log`);
 }
 </script>
